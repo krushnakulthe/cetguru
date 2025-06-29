@@ -6,7 +6,7 @@ const resultsDiv = document.getElementById("results");
 async function populateJeeBranches() {
     // ... (ha function jsa ahe tsa theva)
     try {
-        const response = await fetch("http://127.0.0.1:5000/get-jee-branches");
+        const response = await fetch("https://cet-guru-api.onrender.com/get-jee-branches");
         if (!response.ok) throw new Error('Failed to load branches.');
         const branches = await response.json();
         branchSelect.innerHTML = '<option value="">-- Select a Branch --</option>';
@@ -31,7 +31,7 @@ async function predictJeeColleges() {
     }
     resultsDiv.innerHTML = '<p>🚀 Finding the best colleges for you based on JEE scores...</p>';
     try {
-        const response = await fetch("http://127.0.0.1:5000/predict/jee", {
+        const response = await fetch("https://cet-guru-api.onrender.com/predict/jee", {
             method: "POST",
             mode: "cors",
             headers: { "Content-Type": "application/json" },

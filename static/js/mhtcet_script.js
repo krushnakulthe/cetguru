@@ -39,7 +39,7 @@ async function predictColleges() {
     resultsDiv.innerHTML = '<p>🚀 Finding the best colleges for you...</p>';
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/predict/mhtcet", {
+        const response = await fetch("https://cet-guru-api.onrender.com/predict/mhtcet", {
             method: "POST",
             mode: "cors",
             headers: { "Content-Type": "application/json" },
