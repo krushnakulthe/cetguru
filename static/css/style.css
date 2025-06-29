@@ -810,3 +810,65 @@ button i.ti {
         margin-bottom: 1rem;
     }
 }
+
+/* --- Note for MHT-CET Category Explanation (Upgraded) --- */
+
+.category-note {
+    background-color: var(--light-blue-bg);
+    border-left: 4px solid var(--secondary-color); /* Using secondary color for variety */
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+    border-radius: 8px;
+    color: #495057;
+}
+
+.note-header {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.note-header i {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-right: 8px;
+}
+
+.note-list {
+    list-style-type: none; /* Removes default bullet points */
+    padding-left: 0;
+    margin: 0 0 0.5rem 0;
+}
+
+.note-list li {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+/* Creating custom bullet points for a cleaner look */
+.note-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.note-list li strong {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.note-footer {
+    font-size: 0.85rem;
+    font-style: italic;
+    margin: 0.5rem 0 0 0;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #cdebf3;
+}
