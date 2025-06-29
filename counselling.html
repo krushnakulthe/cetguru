@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Counselling - CET GURU</title>
+    <meta name="description" content="Get expert guidance for your MHT-CET and JEE admission process. Book a personalized counselling session with CET GURU today.">
+    
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    
+    <!-- तुमचा फेव्हिकॉन कोड इथे टाका -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="static/images/cet-guru-logo.png" alt="CET GURU Logo" class="logo-img">
+            <span class="logo-name">College Predictor</span>
+        </a>
+        <button id="menu-toggle" class="menu-toggle">
+            <i class="ti ti-menu-2"></i>
+        </button>
+        <nav id="main-nav">
+            <a href="index.html">Home</a>
+            <a href="selection.html">Predictor</a>
+            <a href="counselling.html" class="active">Counselling</a> <!-- Counselling ला active क्लास द्या -->
+            <a href="index.html#about">About</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="counselling-page-container">
+            <div class="counselling-hero">
+                <div class="counselling-hero-content">
+                    <h1>Confused About the Option Form Filling?</h1>
+                    <p>Let our experts guide you. Get personalized Option List only 50RS </p>
+                </div>
+            </div>
+
+            <div class="counselling-features">
+                <h2>What You Will Get</h2>
+                <div class="counselling-grid">
+                    <div class="counselling-feature-item">
+                        <i class="ti ti-user-circle"></i>
+                        <h3>Personalized Plan</h3>
+                        <p>A custom Option List based on your percentile, category, and interests.</p>
+                    </div>
+                    <div class="counselling-feature-item">
+                        <i class="ti ti-list-check"></i>
+                        <h3>Option Form Filling</h3>
+                        <p>how to fill your CAP round option form to maximize your chances.</p>
+                    </div>
+                    <div class="counselling-feature-item">
+                        <i class="ti ti-school"></i>
+                        <h3>College Selection</h3>
+                        <p>Help in choosing the best possible college and branch for your future career goals.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="counselling-cta">
+                <h2>Ready to Secure Your Admission?</h2>
+                
+                <a href="https://forms.gle/mfJ3RmRrmH2eoWZ1A" target="_blank" class="btn btn-primary-large">
+                    Let's Go! <i class="ti ti-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>CET GURU</h4>
+                <p>Your trusted guide to finding the best colleges through MHT-CET and JEE Main.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="selection.html">Predictor</a>
+                <a href="#about">About Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect With Us</h4>
+                <a href="mailto:cetguru.help@gmail.com"><i class="ti ti-mail"></i> cetguru.help@gmail.com</a>
+                <a href="tel:+919405187570"><i class="ti ti-phone"></i> +91 7249395051</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            
+            <p>© 2024 CET GURU. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- मोबाईल मेन्यूसाठी स्क्रिप्ट -->
+    <script>
+      const menuToggle = document.getElementById('menu-toggle');
+      const mainNav = document.getElementById('main-nav');
+      if (menuToggle && mainNav) {
+        menuToggle.addEventListener('click', function() {
+          mainNav.classList.toggle('nav-active');
+        });
+      }
+    </script>
+
+</body>
+</html>

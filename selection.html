@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Exam | MHT-CET & JEE Main Predictor - CET GURU</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <!-- Favicon and App Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="shortcut icon" href="/favicon.ico">
+</head>
+<body>
+
+    <header>
+    <a href="index.html" class="logo-container">
+        <img src="static/images/cet-guru-logo.png" alt="CET GURU Logo" class="logo-img">
+        <span class="logo-name">College Finder </span>
+    </a>
+
+    <!-- Hamburger Menu Button -->
+    <button id="menu-toggle" class="menu-toggle">
+        <i class="ti ti-menu-2"></i>
+    </button>
+
+    <nav id="main-nav">
+         <!-- तुमच्या प्रत्येक पेजनुसार 'active' क्लास योग्य ठिकाणी ठेवा -->
+         <!-- उदा. index.html साठी Home ला active क्लास द्या -->
+        <a href="index.html">Home</a>
+        <a href="selection.html">Predictor</a>
+        <a href="counselling.html">Counselling</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#contact">Contact</a>
+    </nav>
+</header>
+
+    <main>
+        <div class="selection-page-container">
+            <div class="selection-header">
+                <h1>Choose Your Exam</h1>
+                <p>Select the entrance exam you appeared for to start predicting your college.</p>
+            </div>
+
+            <div class="selection-grid-new">
+                <!-- MHT-CET Card -->
+                <a href="mhtcet.html" class="exam-card-square">
+                    <div class="exam-card-icon-new">
+                        <i class="ti ti-atom-2"></i>
+                    </div>
+                    <h2>MHT-CET</h2>
+                    <p>Find Engineering & Pharmacy colleges in Maharashtra based on your MHT-CET score.</p>
+                </a>
+
+                <!-- JEE Main Card -->
+                <a href="jee.html" class="exam-card-square">
+                    <div class="exam-card-icon-new">
+                        <i class="ti ti-rocket"></i>
+                    </div>
+                    <h2>JEE Main</h2>
+                    <p>Find engineering colleges in Maharashtra based on your JEE Mains score.</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h4>CET GURU</h4>
+                <p>Your trusted guide to finding the best colleges through MHT-CET and JEE Main.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="selection.html">Predictor</a>
+                <a href="index.html#about">About Us</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect With Us</h4>
+                <a href="mailto:cetguru.help@gmail.com"><i class="ti ti-mail"></i> cetguru.help@gmail.com</a>
+                <a href="tel:+919405187570"><i class="ti ti-phone"></i> +91 7249395051</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Developed with 💜 by Krushna Kulthe</p>
+            <p>© 2024 CET GURU. All Rights Reserved.</p>
+        </div>
+    </footer>
+    <!-- ... तुमच्या पेजचा बाकीचा content ... -->
+<script src="..."></script> <!-- आधीचा स्क्रिप्ट टॅग (असल्यास) -->
+
+<!-- हा नवीन स्क्रिप्ट कोड इथे टाका -->
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const mainNav = document.getElementById('main-nav');
+
+  if (menuToggle && mainNav) {
+    menuToggle.addEventListener('click', function() {
+      mainNav.classList.toggle('nav-active');
+    });
+  }
+</script>
+</body>
+</html>
