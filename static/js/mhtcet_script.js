@@ -1,42 +1,84 @@
-// ... (varil sarv code tasach theva) ...
-const categories = {
-    PCM: ["GOPEN", "GSC", "GNTB", "GOBC", "LOPEN", "LST", "LOBC", "EWS", "DEF-O", "DEFR-OBC", "GNTA", "GNTC", "GNTD", "LNTA", "LNTB", "LNTC", "LNTD", "MI", "PWD-O", "PWDR-OBC", "PWDR-SC"],
-    PCB: ["GSCH", "GSTH", "GOBCH", "LOPENH", "LVJH", "LNT2H", "LOBCH", "PWDOPENH", "GSCO", "GNT3O", "GOBCO", "LOPENO", "LSTO", "DEFROBCS", "EWS", "GVJH", "GNT1H", "GNT2H", "GNT3H", "LSCH", "LSTH", "PWDROBCH"]
+// Global variable to store options fetched from the backend
+let mhtcetOptions = {
+    categories: { PCM: [], PCB: [] },
+    branches: { PCM: [], PCB: [] }
 };
-const branches = {
-    PCM: ["Civil Engineering", "Computer Science and Engineering", "Aeronautical Engineering", "Artificial Intelligence", "Artificial Intelligence and Data Science", "Automation and Robotics", "Automobile Engineering", "Chemical Engineering", "Computer Engineering", "Cyber Security", "Data Science", "Electrical Engineering", "Electronics and Telecommunication Engg", "Electronics Engineering", "Information Technology", "Mechanical Engineering", "Mechatronis Engineering", "Robotics", "Textile Technology"],
-    PCB: ["Pharm D ( Doctor of Pharmacy)", "Pharmacy"]
-};
+
+// DOM Elements
 const groupSelect = document.getElementById('group');
 const catSelect = document.getElementById('category');
 const branchSelect = document.getElementById('branch');
+const resultsDiv = document.getElementById("results");
 let currentResults = [];
 
-function filterOptions() {
-    const group = groupSelect.value;
-    catSelect.innerHTML = '';
-    branchSelect.innerHTML = '';
-    const catsForGroup = categories[group] || [];
-    const branchesForGroup = branches[group] || [];
-    catsForGroup.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
-    branchesForGroup.forEach(b => branchSelect.innerHTML += `<option value="${b}">${b}</option>`);
+/**
+ * Fetches MHT-CET options (categories, branches) from the backend.
+ */
+async function fetchMhtcetOptions() {
+    try {
+        // तुमच्या लाइव्ह Render API ची URL वापरा
+        const response = await fetch("https://cet-guru-api.onrender.com/get-mhtcet-options");
+        if (!response.ok) {
+            throw new Error('Failed to load MHT-CET options from server.');
+        }
+        mhtcetOptions = await response.json();
+        // Populate the dropdowns for the first time
+        filterOptions(); 
+    } catch (error) {
+        console.error("Error fetching MHT-CET options:", error);
+        catSelect.innerHTML = '<option>Error loading categories</option>';
+        branchSelect.innerHTML = '<option>Error loading branches</option>';
+    }
 }
 
+/**
+ * Populates category and branch dropdowns based on the selected group.
+ */
+function filterOptions() {
+    const selectedGroup = groupSelect.value;
+    
+    // Clear previous options
+    catSelect.innerHTML = '<option value="">-- Select Category --</option>';
+    branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
+
+    // Populate Category dropdown
+    const categoriesForGroup = mhtcetOptions.categories[selectedGroup] || [];
+    if (categoriesForGroup.length > 0) {
+        categoriesForGroup.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
+    } else {
+        catSelect.innerHTML = '<option>No categories found</option>';
+    }
+
+    // Populate Branch dropdown
+    const branchesForGroup = mhtcetOptions.branches[selectedGroup] || [];
+    if (branchesForGroup.length > 0) {
+        branchesForGroup.forEach(b => branchSelect.innerHTML += `<option value="${b}">${b}</option>`);
+    } else {
+        branchSelect.innerHTML = '<option>No branches found</option>';
+    }
+}
+
+/**
+ * Predicts colleges based on user input.
+ */
 async function predictColleges() {
-    // ... (ha function jsa ahe tsa theva)
     const percentile = parseFloat(document.getElementById('percentile').value);
     const group = document.getElementById('group').value;
     const category = document.getElementById('category').value;
     const branch = document.getElementById('branch').value;
     const city = document.getElementById('city').value.trim();
-    const resultsDiv = document.getElementById("results");
 
-    if (isNaN(percentile)) {
-        alert("Please enter a valid percentile.");
+    if (isNaN(percentile) || !category || !branch) {
+        alert("Please enter your percentile and select a category and branch.");
         return;
     }
 
-    resultsDiv.innerHTML = '<p>🚀 Finding the best colleges for you...</p>';
+    resultsDiv.innerHTML = `
+        <div class="results-loading">
+            <div class="spinner"></div>
+            <p>Finding the best colleges for you...</p>
+        </div>
+    `;
 
     try {
         const response = await fetch("https://cet-guru-api.onrender.com/predict/mhtcet", {
@@ -56,40 +98,36 @@ async function predictColleges() {
         displayColleges(data);
 
     } catch (err) {
-        resultsDiv.innerHTML = `<p style='color:red;'><strong>Error:</strong> Could not get prediction. Please check the backend server logs for more details. Error: ${err.message}</p>`;
+        resultsDiv.innerHTML = `<div class="no-results"><strong>Error:</strong> Could not get prediction. Please check the backend server logs. <br>Details: ${err.message}</div>`;
         console.error(err);
     }
 }
 
-
-// === फक्त हा फंक्शन बदला / Update only this function ===
+/**
+ * Displays the list of predicted colleges.
+ */
 function displayColleges(data) {
-    const resultsDiv = document.getElementById("results");
     resultsDiv.innerHTML = ''; // Clear previous results
     
-    // Get user's percentile to calculate admission chance
     const userPercentile = parseFloat(document.getElementById('percentile').value);
 
     if (data.length === 0) {
-        resultsDiv.innerHTML = '<p>No matching colleges found. Try adjusting your filters or checking a slightly lower percentile.</p>';
+        resultsDiv.innerHTML = '<div class="no-results"><p>No matching colleges found. Try adjusting your filters.</p></div>';
     } else {
         resultsDiv.innerHTML = `<h3>Found ${data.length} potential colleges for you:</h3>`;
         data.forEach(college => {
             const cutoff = college["Percent"];
             const difference = userPercentile - cutoff;
             
-            let chance = '';
-            let chanceClass = '';
+            let chance = 'Tough Chance';
+            let chanceClass = 'chance-low';
 
             if (difference >= 3) {
                 chance = 'High Chance';
-                chanceClass = 'chance-high'; // Green color
+                chanceClass = 'chance-high';
             } else if (difference >= 0.5) {
                 chance = 'Medium Chance';
-                chanceClass = 'chance-medium'; // Orange color
-            } else {
-                chance = 'Tough Chance';
-                chanceClass = 'chance-low'; // Red color
+                chanceClass = 'chance-medium';
             }
 
             const div = document.createElement("div");
@@ -107,15 +145,16 @@ function displayColleges(data) {
     }
 }
 
-// ... (downloadCSV() function tasach theva) ...
+/**
+ * Downloads the current results as a CSV file.
+ */
 function downloadCSV() {
     if (currentResults.length === 0) {
         alert("No results to download. Please predict colleges first.");
         return;
     }
-    const userPercentile = parseFloat(document.getElementById('percentile').value);
+    const userPercentile = parseFloat(document.getElementById('percentile').value) || 0;
     
-    // Add "Admission Chance" to headers
     const headers = ["College Name", "Course Name", "Choice Code", "Category", "Closing Percentile", "Admission Chance"];
     
     const rows = currentResults.map(c => {
@@ -145,4 +184,6 @@ function downloadCSV() {
     document.body.removeChild(link);
 }
 
-document.addEventListener('DOMContentLoaded', filterOptions);
+// === Event Listener ===
+// This function will be called as soon as the page loads.
+document.addEventListener('DOMContentLoaded', fetchMhtcetOptions);
