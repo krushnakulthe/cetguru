@@ -134,6 +134,7 @@ function displayColleges(data) {
             div.className = "college-card";
             div.innerHTML = `
                 <strong>${college["College Name"]}</strong>
+                <p><strong>College Code:</strong> ${college["College Code"]}</p> 
                 <p><strong>Branch:</strong> ${college["Course Name"]}</p>
                 <p><strong>Category:</strong> ${college["Category"]}</p>
                 <p><strong>Choice Code:</strong> <span class="choice-code">${college["Choice Code"]}</span></p>
