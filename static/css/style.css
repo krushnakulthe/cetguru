@@ -224,40 +224,87 @@ button i.ti {
 /* --- Index Page - Professional Styling --- */
 
 /* Hero Section */
-.hero-section {
-    background: linear-gradient(rgba(0, 50, 100, 0.7), rgba(0, 25, 50, 0.8)), url('https://source.unsplash.com/random/1600x900/?university,library') no-repeat center center/cover;
-    color: white;
-    text-align: center;
-    padding: 6rem 2rem;
-    animation: fadeIn 1.5s ease-in-out;
+/* --- New Hero Section Styling (Two-Column Layout) --- */
+
+.new-hero-section {
+    padding: 4rem 2rem;
+    background-color: var(--light-blue-bg); /* A light background for the section */
 }
 
-.hero-content {
-    max-width: 800px;
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 2rem;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
-.hero-section h1 {
-    font-size: 3.2rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: white; /* Override default color */
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+.hero-card {
+    padding: 2.5rem;
+    border-radius: 16px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-.hero-section p {
-    font-size: 1.25rem;
-    margin-bottom: 2.5rem;
+.hero-card-icon {
+    font-size: 3.5rem; /* 56px */
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+}
+
+.hero-card h2 {
+    font-size: 2.2rem;
+    color: white;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+}
+
+.hero-card p {
+    font-size: 1.1rem;
     color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    flex-grow: 1; /* Pushes the button to the bottom */
+    margin-bottom: 2rem;
 }
 
-.btn-primary-large {
-    font-size: 1.2rem;
-    padding: 1rem 2.5rem;
-    border-radius: 50px; /* Pill shape */
-    box-shadow: 0 4px 15px rgba(0, 119, 182, 0.4);
+/* Card-specific backgrounds */
+.predictor-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
 }
 
+.counselling-card {
+    background: linear-gradient(135deg, #6c757d, #343a40); /* A different color scheme */
+}
+
+.btn-hero {
+    width: 100%;
+    max-width: 280px;
+    font-size: 1.1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 50px;
+}
+
+.btn.btn-outline-hero {
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.btn.btn-outline-hero:hover {
+    background-color: white;
+    color: #343a40; /* Match counselling card's dark color */
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 900px) {
+    .hero-grid {
+        grid-template-columns: 1fr; /* Stack cards vertically */
+    }
+}
 /* Features Section (Why Choose Us) */
 .features-section {
     padding: 4rem 2rem;
