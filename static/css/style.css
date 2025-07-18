@@ -599,7 +599,7 @@ button i.ti {
 .predictor-page-main-new {
     max-width: 800px;
     margin: 3rem auto;
-    padding: 0 1.5rem;
+     padding: 0 0.05rem; 
 }
 
 .predictor-card-new {
@@ -1018,4 +1018,31 @@ button i.ti {
     margin: 0.5rem 0 0 0;
     padding-top: 0.5rem;
     border-top: 1px dashed #cdebf3;
+}
+/* --- Responsive adjustments for smaller screens --- */
+
+@media (max-width: 576px) {
+    /* मोबाईल स्क्रीनसाठी प्रेडिक्टर पेजला कमी padding देऊ */
+    .predictor-page-main-new {
+        padding: 0 0.5rem; 
+    }
+
+    /* मोबाईल स्क्रीनसाठी कार्डच्या आतली padding कमी करू */
+    .predictor-card-new {
+        padding: 1.5rem 1rem;
+    }
+
+    /* निकालांच्या कार्डमधील padding सुद्धा कमी करू */
+    .college-card {
+        padding: 1rem;
+    }
+    
+    /* निकालांमधील मजकूराचा आकार थोडा कमी करू */
+    .college-card p {
+        font-size: 0.95rem;
+    }
+
+    .college-card strong.college-title {
+        font-size: 1.15rem;
+    }
 }
