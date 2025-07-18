@@ -236,38 +236,19 @@ input:focus, select:focus {
 
 /* --- Media Query for DESKTOP View --- */
 /* This code will apply ONLY when the screen is wider than 768px */
+/* --- Media Query for DESKTOP View --- */
 @media (min-width: 768px) {
     .college-card p {
-        display: flex; /* Arrange label and value side-by-side */
-        justify-content: space-between; /* Push them to opposite ends */
+        display: flex;
+        justify-content: flex-start; /* 'space-between' ऐवजी 'flex-start' */
         align-items: baseline;
     }
 
     .college-card p strong {
-        display: inline; /* Make label and value appear on the same line */
+        display: inline;
         margin-bottom: 0;
-        margin-right: 1rem; /* Add space between label and value */
+        margin-right: 0.5rem; /* लेबल आणि व्हॅल्यूमधील अंतर (8px) */
     }
-}
-
-
-/* Making the "(Cutoff)" part a lighter color (works on both views) */
-.college-card p strong::after {
-    content: " (Cutoff)";
-    color: #6c757d;
-    font-weight: 400;
-    display: none;
-}
-.college-card p strong.cutoff-label::after {
-    display: inline;
-}
-
-/* Styles for nested spans like Admission Chance & Choice Code (works on both views) */
-.college-card p span {
-    font-weight: 500;
-}
-.college-card p span span {
-    font-weight: 700;
 }
 /* --- Footer --- */
 footer {
