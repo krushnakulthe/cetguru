@@ -82,13 +82,13 @@ function displayJeeColleges(data) {
             const div = document.createElement("div");
             div.className = "college-card";
             div.innerHTML = `
-                <strong>${college["College Name"]}</strong>
-                <p><strong>Branch:</strong> ${college["Course Name"]}</p>
-                <p><strong>Choice Code:</strong> <span class="choice-code">${college["Choice Code"]}</span></p>
-                <p><strong>Closing Percentile (Cutoff):</strong> ${cutoff}%</p>
-                <p><strong>Closing Rank (Cutoff):</strong> ${college["Closing Rank"] || 'N/A'}</p>
-                <p><strong>Admission Chance:</strong> <span class="${chanceClass}">${chance}</span></p>
-            `;
+    <strong class="college-title">${college["College Name"]}</strong>
+    <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
+    <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
+    <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
+    <p><strong>Closing Rank (Cutoff):</strong> <span>${college["Closing Rank"] || 'N/A'}</span></p>
+    <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
+`;
             resultsDiv.appendChild(div);
         });
     }

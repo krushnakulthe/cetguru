@@ -76,12 +76,12 @@ function displayNursingColleges(data) {
         const div = document.createElement("div");
         div.className = "college-card";
         div.innerHTML = `
-            <strong>${college["College Name"]}</strong>
-            <p><strong>College Code:</strong> ${college["College Code"] || 'N/A'}</p>
-            <p><strong>Category:</strong> ${college["Category"]}</p>
-            <p><strong>Closing Percentile (Cutoff):</strong> ${cutoff}%</p>
-            <p><strong>Admission Chance:</strong> <span class="${chanceClass}">${chance}</span></p> <!-- ही नवीन ओळ आहे -->
-        `;
+    <strong class="college-title">${college["College Name"]}</strong>
+    <p><strong>College Code:</strong> <span>${college["College Code"] || 'N/A'}</span></p>
+    <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
+    <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
+    <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
+`;
         resultsDiv.appendChild(div);
     });
 }
