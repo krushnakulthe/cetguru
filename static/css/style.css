@@ -139,8 +139,27 @@ input:focus, select:focus {
   box-shadow: 0 0 8px var(--glow-color);
 }
 
-/* --- Final Compact Side-by-Side Results Card Styling --- */
+/* --- Final Compact & Responsive Predictor Page and Results Card Design --- */
 
+/* Main container for the predictor page */
+.predictor-page-main-new {
+    max-width: 1100px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+}
+
+/* The white card holding the form */
+.predictor-card-new {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+}
+/* ... (तुमचा predictor-card-new चा बाकीचा कोड जसा आहे तसाच ठेवा) ... */
+
+
+/* Results section */
 .results {
     margin-top: 2rem;
     padding: 0;
@@ -148,8 +167,8 @@ input:focus, select:focus {
 
 .college-card {
   background-color: var(--card-bg);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
+  padding: 0.8rem 1rem;      /* Padding कमी केली */
+  margin-bottom: 1rem;        /* Margin कमी केली */
   border-radius: 12px;
   border-left: 5px solid var(--primary-color);
   box-shadow: 0 5px 20px rgba(0,0,0,0.06);
@@ -162,46 +181,71 @@ input:focus, select:focus {
   box-shadow: 0 8px 30px rgba(0, 119, 182, 0.15), 0 0 20px rgba(0, 119, 182, 0.1);
 }
 
-/* College Name (Title) */
 .college-card strong.college-title {
     display: block; 
-    font-size: 1.3rem;
+    font-size: 1.15rem;           /* फॉन्ट साईज कमी केली */
     color: var(--primary-color);
     font-weight: 700;
     word-break: break-word;
     line-height: 1.3;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 0.8rem;        /* Margin कमी केली */
+    padding-bottom: 0.4rem;       /* Padding कमी केली */
     border-bottom: 1px solid #e9ecef;
 }
 
-/* This is the key change to make everything side-by-side */
+/* Default layout for Desktop (side-by-side) */
 .college-card p {
     display: grid;
-    grid-template-columns: auto 1fr; /* Two columns: Label and Value */
+    grid-template-columns: auto 1fr;
     align-items: baseline;
-    gap: 0.75rem; /* Space between label and value */
-    margin: 0.7rem 0 0 0;
+    gap: 0.75rem;
+    margin: 0.5rem 0 0 0;       /* Margin कमी केली */
     line-height: 1.4;
-    font-size: 1rem;
+    font-size: 0.95rem;           /* फॉन्ट साईज कमी केली */
     font-weight: 500;
     color: var(--text-color);
 }
 
-/* The label part (e.g., "Branch:") */
 .college-card p strong {
     font-weight: 600;
     color: #0077B6;
-    white-space: nowrap; /* Prevents label from breaking */
+    white-space: nowrap;
 }
 
-/* Styles for nested spans like Admission Chance & Choice Code */
 .college-card p span {
     font-weight: 500;
-    text-align: left; /* Aligns the value to the left */
+    text-align: left;
 }
+
 .college-card p span span {
     font-weight: 700;
+}
+
+/* Responsive adjustments for Mobile */
+@media (max-width: 576px) {
+    .predictor-page-main-new {
+        padding: 0 0.75rem;
+    }
+    
+    /* Change to "Label on Top" layout ONLY on mobile */
+    .college-card p {
+        display: block;
+        margin-top: 0.8rem;       /* Margin कमी केली */
+    }
+    
+    .college-card p strong {
+        display: block;
+        font-size: 0.75rem;       /* फॉन्ट साईज कमी केली */
+        font-weight: 600;
+        color: var(--primary-color); /* मोबाईलवर सुद्धा कलरफुल ठेवले */
+        text-transform: uppercase;
+        margin-bottom: 0.15rem;     /* Margin कमी केली */
+    }
+    
+    .college-card p span {
+        font-size: 1rem;          /* फॉन्ट साईज कमी केली */
+        font-weight: 500;
+    }
 }
 
 /* --- Footer --- */
