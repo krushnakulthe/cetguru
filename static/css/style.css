@@ -139,21 +139,53 @@ input:focus, select:focus {
   box-shadow: 0 0 8px var(--glow-color);
 }
 
-/* --- Results --- */
-.results { margin-top: 2.5rem; }
+/* --- Results (Upgraded with Color Differentiation - CSS Only) --- */
+
 .college-card {
   background-color: var(--light-blue-bg);
-  padding: 1.2rem; margin-bottom: 1rem;
-  border-radius: 8px; border-left: 5px solid var(--primary-color);
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  border-left: 5px solid var(--primary-color);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: slideUpIn 0.6s ease-out forwards;
+  overflow: hidden; 
 }
+
 .college-card:hover {
-  transform: translateY(-5px) scale(1.02);
+  transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
-.college-card strong { font-size: 1.2rem; color: #005A8D; }
-.college-card p { margin: 0.4rem 0; }
+
+/* College Name (Title) */
+.college-card > strong:first-child {
+    display: block; 
+    font-size: 1.3rem;
+    color: #005A8D;
+    word-wrap: break-word;
+    word-break: break-word;
+    line-height: 1.4;
+    margin-bottom: 0.8rem;
+}
+
+/* All other <p> tags inside the card */
+.college-card p {
+    margin: 0.5rem 0 0 0;
+    line-height: 1.5;
+    font-size: 1rem;
+    color: #343A40; /* व्हॅल्यूसाठी गडद राखाडी रंग */
+}
+
+/* The label part (e.g., "College Code:", "Category:") */
+.college-card p strong {
+    color: #005A8D;  /* लेबलसाठी गडद निळा रंग */
+    font-weight: 700;
+    margin-right: 8px; /* लेबल आणि व्हॅल्यूमध्ये जागा */
+}
+
+/* Admission Chance span will still get its color from .chance-high etc. */
+.college-card p span {
+    font-weight: bold;
+}
 
 /* --- Footer --- */
 footer {
