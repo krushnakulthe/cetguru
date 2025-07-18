@@ -53,46 +53,46 @@ async function predictJeeColleges() {
 
 // === फक्त हा फंक्शन बदला / Update only this function ===
 function displayJeeColleges(data) {
-    resultsDiv.innerHTML = ''; // Clear
+    resultsDiv.innerHTML = '';
     const userPercentile = parseFloat(document.getElementById('percentile').value);
 
     if (data.length === 0) {
-        resultsDiv.innerHTML = '<p>No matching colleges found for your criteria. Try adjusting the filters.</p>';
-    } else {
-        resultsDiv.innerHTML = `<h3>Found ${data.length} potential colleges for you:</h3>`;
-        data.forEach(college => {
-            const cutoff = college["Percentile"];
-            const difference = userPercentile - cutoff;
-
-            let chance = '';
-            let chanceClass = '';
-
-            // For JEE, percentile gaps can be smaller. Let's adjust thresholds.
-            if (difference >= 0.5) {
-                chance = 'High Chance';
-                chanceClass = 'chance-high';
-            } else if (difference >= 0.1) {
-                chance = 'Medium Chance';
-                chanceClass = 'chance-medium';
-            } else {
-                chance = 'Tough Chance';
-                chanceClass = 'chance-low';
-            }
-
-            const div = document.createElement("div");
-            div.className = "college-card";
-            div.innerHTML = `
-    <strong class="college-title">${college["College Name"]}</strong>
-    <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
-    <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
-    <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
-    <p><strong>Closing Rank (Cutoff):</strong> <span>${college["Closing Rank"] || 'N/A'}</span></p>
-    <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
-`;
-            resultsDiv.appendChild(div);
-        });
+        resultsDiv.innerHTML = '<div class="no-results"><p>No matching colleges found.</p></div>';
+        return;
     }
+    
+    const resultHeader = document.createElement('h3');
+    resultHeader.textContent = `Found ${data.length} potential colleges for you:`;
+    resultsDiv.appendChild(resultHeader);
+
+    data.forEach(college => {
+        const cutoff = college["Percentile"];
+        const difference = userPercentile - cutoff;
+        let chance = 'Tough Chance';
+        let chanceClass = 'chance-low';
+        if (difference >= 0.5) {
+            chance = 'High Chance';
+            chanceClass = 'chance-high';
+        } else if (difference >= 0.1) {
+            chance = 'Medium Chance';
+            chanceClass = 'chance-medium';
+        }
+
+        const div = document.createElement("div");
+        div.className = "college-card";
+        // --- ही रचना महत्त्वाची आहे ---
+        div.innerHTML = `
+            <strong class="college-title">${college["College Name"]}</strong>
+            <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
+            <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
+            <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
+            <p><strong>Closing Rank (Cutoff):</strong> <span>${college["Closing Rank"] || 'N/A'}</span></p>
+            <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
+        `;
+        resultsDiv.appendChild(div);
+    });
 }
+
 
 // ... (downloadJeeCSV() function tasach theva) ...
 function downloadJeeCSV() {

@@ -107,43 +107,45 @@ async function predictColleges() {
  * Displays the list of predicted colleges.
  */
 function displayColleges(data) {
-    resultsDiv.innerHTML = ''; // Clear previous results
-    
+    resultsDiv.innerHTML = '';
     const userPercentile = parseFloat(document.getElementById('percentile').value);
 
     if (data.length === 0) {
-        resultsDiv.innerHTML = '<div class="no-results"><p>No matching colleges found. Try adjusting your filters.</p></div>';
-    } else {
-        resultsDiv.innerHTML = `<h3>Found ${data.length} potential colleges for you:</h3>`;
-        data.forEach(college => {
-            const cutoff = college["Percent"];
-            const difference = userPercentile - cutoff;
-            
-            let chance = 'Tough Chance';
-            let chanceClass = 'chance-low';
-
-            if (difference >= 3) {
-                chance = 'High Chance';
-                chanceClass = 'chance-high';
-            } else if (difference >= 0.5) {
-                chance = 'Medium Chance';
-                chanceClass = 'chance-medium';
-            }
-
-            const div = document.createElement("div");
-            div.className = "college-card";
-            div.innerHTML = `
-    <strong class="college-title">${college["College Name"]}</strong>
-    <p><strong>College Code:</strong> <span>${college["College Code"] || 'N/A'}</span></p>
-    <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
-    <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
-    <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
-    <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
-    <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
-`;
-            resultsDiv.appendChild(div);
-        });
+        resultsDiv.innerHTML = '<div class="no-results"><p>No matching colleges found.</p></div>';
+        return;
     }
+    
+    const resultHeader = document.createElement('h3');
+    resultHeader.textContent = `Found ${data.length} potential colleges for you:`;
+    resultsDiv.appendChild(resultHeader);
+
+    data.forEach(college => {
+        const cutoff = college["Percent"];
+        const difference = userPercentile - cutoff;
+        let chance = 'Tough Chance';
+        let chanceClass = 'chance-low';
+        if (difference >= 3) {
+            chance = 'High Chance';
+            chanceClass = 'chance-high';
+        } else if (difference >= 0.5) {
+            chance = 'Medium Chance';
+            chanceClass = 'chance-medium';
+        }
+
+        const div = document.createElement("div");
+        div.className = "college-card";
+        // --- ही रचना महत्त्वाची आहे ---
+        div.innerHTML = `
+            <strong class="college-title">${college["College Name"]}</strong>
+            <p><strong>College Code:</strong> <span>${college["College Code"] || 'N/A'}</span></p>
+            <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
+            <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
+            <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
+            <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
+            <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
+        `;
+        resultsDiv.appendChild(div);
+    });
 }
 
 /**
