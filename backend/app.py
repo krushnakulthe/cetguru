@@ -1,8 +1,7 @@
-# ... तुमचे सर्व import आणि सुरुवातीचा कोड जसा आहे तसाच ठेवा ...
+import os
+import pandas as pd
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import pandas as pd
-import os
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -11,11 +10,13 @@ CORS(app)
 # --- Global variables for dataframes ---
 mhtcet_data = None
 jee_data = None
+dse_data = None
+nursing_data = None
 
 # --- Data Loading and Cleaning Function ---
 def load_data():
-    """Loads and cleans the CSV data into pandas DataFrames."""
-    global mhtcet_data, jee_data
+    """Loads and cleans all the CSV data into pandas DataFrames."""
+    global mhtcet_data, jee_data, dse_data, nursing_data
     try:
         backend_dir = os.path.dirname(os.path.abspath(__file__))
         
@@ -28,126 +29,170 @@ def load_data():
             temp_mhtcet_df['Percent'] = pd.to_numeric(temp_mhtcet_df['Percent'], errors='coerce')
             temp_mhtcet_df.dropna(subset=['Percent'], inplace=True)
             mhtcet_data = temp_mhtcet_df
-            print("MHT-CET data loaded and cleaned successfully!")
-        else:
-            print("ERROR: 'Percent' column not found in mhtcet_data.csv")
+            print("MHT-CET data loaded successfully!")
 
         # === JEE Data Loading ===
         jee_path = os.path.join(backend_dir, 'data', 'jee_data.csv')
         temp_jee_df = pd.read_csv(jee_path)
-        
         required_jee_cols = ['College Name', 'Course Name', 'Percentile', 'Closing Rank']
         if all(col in temp_jee_df.columns for col in required_jee_cols):
             temp_jee_df['Percentile'] = pd.to_numeric(temp_jee_df['Percentile'], errors='coerce')
             temp_jee_df['Closing Rank'] = pd.to_numeric(temp_jee_df['Closing Rank'], errors='coerce')
             temp_jee_df.dropna(subset=['Percentile', 'Course Name'], inplace=True)
             jee_data = temp_jee_df
-            print("JEE data loaded and cleaned successfully! (Using direct search for city)")
-        else:
-            print("ERROR: One or more required columns are missing in jee_data.csv. Required: ", required_jee_cols)
+            print("JEE data loaded successfully!")
+            
+        # === Direct Second Year (DSE) Data Loading ===
+        dse_path = os.path.join(backend_dir, 'data', 'dse_data.csv')
+        temp_dse_df = pd.read_csv(dse_path)
+        if 'Percent' in temp_dse_df.columns:
+            if temp_dse_df['Percent'].dtype == 'object':
+                 temp_dse_df['Percent'] = temp_dse_df['Percent'].astype(str).str.replace('%', '', regex=False)
+            temp_dse_df['Percent'] = pd.to_numeric(temp_dse_df['Percent'], errors='coerce')
+            temp_dse_df.dropna(subset=['Percent'], inplace=True)
+            dse_data = temp_dse_df
+            print("DSE data loaded successfully!")
+            
+        # === B.Sc. Nursing Data Loading ===
+        nursing_path = os.path.join(backend_dir, 'data', 'nursing_data.csv')
+        temp_nursing_df = pd.read_csv(nursing_path)
+        if 'Percent' in temp_nursing_df.columns:
+            if temp_nursing_df['Percent'].dtype == 'object':
+                 temp_nursing_df['Percent'] = temp_nursing_df['Percent'].astype(str).str.replace('%', '', regex=False)
+            temp_nursing_df['Percent'] = pd.to_numeric(temp_nursing_df['Percent'], errors='coerce')
+            temp_nursing_df.dropna(subset=['Percent'], inplace=True)
+            nursing_data = temp_nursing_df
+            print("Nursing data loaded successfully!")
 
     except FileNotFoundError as e:
-        print(f"FATAL ERROR: {e}. Make sure the CSV files are in the 'backend/data/' directory.")
+        print(f"FATAL ERROR: {e}. Make sure all CSV files are present in the 'backend/data/' directory.")
     except Exception as e:
         print(f"FATAL ERROR during data loading: {e}")
 
 # --- API Endpoints ---
 
-@app.route('/get-jee-branches', methods=['GET'])
-def get_jee_branches():
-    """Returns a list of unique branch names from the JEE dataset."""
-    if jee_data is not None and 'Course Name' in jee_data.columns:
-        branches = sorted(jee_data['Course Name'].dropna().unique().tolist())
-        return jsonify(branches)
-    print("JEE Branch Error: jee_data is None or 'Course Name' column is missing.")
-    return jsonify({"error": "JEE data not available or is malformed. Check server logs."}), 500
-
-
-# === हा नवीन कोड इथे जोडा / ADD THIS NEW CODE HERE ===
+# --- Endpoints for MHT-CET ---
 @app.route('/get-mhtcet-options', methods=['GET'])
 def get_mhtcet_options():
-    """Returns unique categories and branches for MHT-CET based on PCM/PCB group."""
     if mhtcet_data is not None:
-        try:
-            # Get all unique categories and branches for each group
-            pcm_categories = sorted(mhtcet_data[mhtcet_data['Group'] == 'PCM']['Category'].unique().tolist())
-            pcb_categories = sorted(mhtcet_data[mhtcet_data['Group'] == 'PCB']['Category'].unique().tolist())
-            
-            pcm_branches = sorted(mhtcet_data[mhtcet_data['Group'] == 'PCM']['Course Name'].unique().tolist())
-            pcb_branches = sorted(mhtcet_data[mhtcet_data['Group'] == 'PCB']['Course Name'].unique().tolist())
-
-            options = {
-                "categories": {
-                    "PCM": pcm_categories,
-                    "PCB": pcb_categories
-                },
-                "branches": {
-                    "PCM": pcm_branches,
-                    "PCB": pcb_branches
-                }
-            }
-            return jsonify(options)
-        except Exception as e:
-            print(f"Error in /get-mhtcet-options: {e}")
-            return jsonify({"error": "Failed to retrieve MHT-CET options."}), 500
+        options = {
+            "categories": {"PCM": sorted(mhtcet_data[mhtcet_data['Group'] == 'PCM']['Category'].unique().tolist()),"PCB": sorted(mhtcet_data[mhtcet_data['Group'] == 'PCB']['Category'].unique().tolist())},
+            "branches": {"PCM": sorted(mhtcet_data[mhtcet_data['Group'] == 'PCM']['Course Name'].unique().tolist()),"PCB": sorted(mhtcet_data[mhtcet_data['Group'] == 'PCB']['Course Name'].unique().tolist())}
+        }
+        return jsonify(options)
     return jsonify({"error": "MHT-CET data not loaded"}), 500
-# === नवीन कोड इथे संपतो ===
-
 
 @app.route('/predict/mhtcet', methods=['POST'])
 def predict_mhtcet():
-    # हा कोड जसा आहे तसाच ठेवा
-    if mhtcet_data is None:
-        return jsonify({"error": "MHT-CET data not loaded. Check server logs."}), 500
+    if mhtcet_data is None: return jsonify({"error": "MHT-CET data not loaded."}), 500
     try:
         data = request.json
         user_percentile = float(data.get('percentile', 0))
-        group = data.get('group')
-        category = data.get('category')
-        branch = data.get('branch')
-        city = data.get('city', '').strip().lower()
-        filtered = mhtcet_data.copy()
-        filtered = filtered[
-            (filtered['Percent'] <= user_percentile) &
-            (filtered['Group'].astype(str) == str(group)) &
-            (filtered['Category'].astype(str) == str(category)) &
-            (filtered['Course Name'].astype(str) == str(branch))
-        ]
+        group, category, branch, city = data.get('group'), data.get('category'), data.get('branch'), data.get('city', '').strip().lower()
+        
+        filtered = mhtcet_data[
+            (mhtcet_data['Percent'] <= user_percentile) & (mhtcet_data['Group'] == group) &
+            (mhtcet_data['Category'] == category) & (mhtcet_data['Course Name'] == branch)
+        ].copy()
+        
         if city:
             filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
-        result = filtered.sort_values(by='Percent', ascending=False)
-        return jsonify(result.to_dict('records'))
+        
+        return jsonify(filtered.sort_values(by='Percent', ascending=False).to_dict('records'))
     except Exception as e:
-        print(f"Error in /predict/mhtcet: {e}")
-        return jsonify({"error": f"An error occurred during MHT-CET prediction: {e}"}), 400
+        return jsonify({"error": f"An error occurred: {e}"}), 400
 
-
+# --- Endpoints for JEE Main ---
+@app.route('/get-jee-branches', methods=['GET'])
+def get_jee_branches():
+    if jee_data is not None:
+        return jsonify(sorted(jee_data['Course Name'].dropna().unique().tolist()))
+    return jsonify({"error": "JEE data not available"}), 500
+    
 @app.route('/predict/jee', methods=['POST'])
 def predict_jee():
-    # हा कोड जसा आहे तसाच ठेवा
-    if jee_data is None:
-        return jsonify({"error": "JEE data not loaded. Check server logs."}), 500
+    if jee_data is None: return jsonify({"error": "JEE data not loaded."}), 500
     try:
         data = request.json
-        user_percentile = float(data.get('percentile', 0))
-        branch = data.get('branch')
-        city = data.get('city', '').strip().lower()
-        filtered = jee_data.copy()
-        filtered = filtered[
-            (filtered['Percentile'] <= user_percentile) &
-            (filtered['Course Name'].astype(str) == str(branch))
-        ]
+        user_percentile, branch, city = float(data.get('percentile', 0)), data.get('branch'), data.get('city', '').strip().lower()
+        
+        filtered = jee_data[
+            (jee_data['Percentile'] <= user_percentile) & (jee_data['Course Name'] == branch)
+        ].copy()
+        
         if city:
             filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
-        result = filtered.sort_values(by='Percentile', ascending=False)
-        return jsonify(result.to_dict('records'))
+        
+        return jsonify(filtered.sort_values(by='Percentile', ascending=False).to_dict('records'))
     except Exception as e:
-        print(f"Error in /predict/jee: {e}")
-        return jsonify({"error": f"An error occurred during JEE prediction: {e}"}), 400
+        return jsonify({"error": f"An error occurred: {e}"}), 400
 
+# --- Endpoints for Direct Second Year (DSE) ---
+@app.route('/get-dse-options', methods=['GET'])
+def get_dse_options():
+    if dse_data is not None:
+        try:
+            # Case-insensitive filtering for group names
+            eng_cat = sorted(dse_data[dse_data['Group'].str.lower() == 'eng']['Category'].unique().tolist())
+            phy_cat = sorted(dse_data[dse_data['Group'].str.lower() == 'phy']['Category'].unique().tolist())
+            eng_branch = sorted(dse_data[dse_data['Group'].str.lower() == 'eng']['Course Name'].unique().tolist())
+            phy_branch = sorted(dse_data[dse_data['Group'].str.lower() == 'phy']['Course Name'].unique().tolist())
+
+            options = {
+                "categories": {"eng": eng_cat, "phy": phy_cat},
+                "branches": {"eng": eng_branch, "phy": phy_branch}
+            }
+            return jsonify(options)
+        except Exception as e:
+            return jsonify({"error": f"Failed to retrieve DSE options: {e}"}), 500
+    return jsonify({"error": "DSE data not loaded"}), 500
+
+@app.route('/predict/dse', methods=['POST'])
+def predict_dse():
+    if dse_data is None: return jsonify({"error": "DSE data not loaded."}), 500
+    try:
+        data = request.json
+        user_percentile, group, category, branch, city = float(data.get('percentile', 0)), data.get('group'), data.get('category'), data.get('branch'), data.get('city', '').strip().lower()
+        
+        filtered = dse_data[
+            (dse_data['Percent'] <= user_percentile) & (dse_data['Group'].str.lower() == group) &
+            (dse_data['Category'] == category) & (dse_data['Course Name'] == branch)
+        ].copy()
+        
+        if city:
+            filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
+        
+        return jsonify(filtered.sort_values(by='Percent', ascending=False).to_dict('records'))
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {e}"}), 400
+
+# --- Endpoints for B.Sc. Nursing ---
+@app.route('/get-nursing-categories', methods=['GET'])
+def get_nursing_categories():
+    if nursing_data is not None:
+        return jsonify(sorted(nursing_data['Category'].unique().tolist()))
+    return jsonify({"error": "Nursing data not available"}), 500
+
+@app.route('/predict/nursing', methods=['POST'])
+def predict_nursing():
+    if nursing_data is None: return jsonify({"error": "Nursing data not loaded."}), 500
+    try:
+        data = request.json
+        user_percentile, category, city = float(data.get('percentile', 0)), data.get('category'), data.get('city', '').strip().lower()
+
+        filtered = nursing_data[
+            (nursing_data['Percent'] <= user_percentile) & (nursing_data['Category'] == category)
+        ].copy()
+        
+        if city:
+            filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
+        
+        return jsonify(filtered.sort_values(by='Percent', ascending=False).to_dict('records'))
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {e}"}), 400
 
 # Load data when the application starts
 load_data()
 
 if __name__ == '__main__':
-     app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
+     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

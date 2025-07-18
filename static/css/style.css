@@ -561,7 +561,76 @@ button i.ti {
     color: #6c757d;
     line-height: 1.5;
 }
+/* --- New Predictor Page Design --- */
 
+.predictor-page-main-new {
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+}
+
+.predictor-card-new {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem; /* Add space for results below */
+}
+
+.predictor-card-new h2.card-title {
+    text-align: center;
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin: 0 0 2rem 0;
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.form-group label i {
+    font-size: 1.1rem;
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+/* Overriding general input/select for this specific design */
+.form-group input, .form-group select {
+    padding: 0.9rem 1rem;
+    border: 1px solid #ddd;
+}
+
+.form-group input:focus, .form-group select:focus {
+    box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.15);
+}
+
+.predict-button-container {
+    margin-top: 2.5rem;
+    text-align: center;
+}
+
+.predict-button-container .btn {
+    width: 100%;
+    max-width: 350px;
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+/* Overriding general .results style for new layout */
+.results {
+    margin-top: 0;
+    padding: 0;
+}
 /* --- Responsive Navigation Menu --- */
 
 /* Initially hide the hamburger menu on desktop */
@@ -691,7 +760,7 @@ button i.ti {
 }
 
 .faq-item.active .faq-answer {
-    max-height: 200px; /* Adjust if your answer is longer */
+    max-height: 500px; /* Adjust if your answer is longer */
 }
 
 /* --- Counselling Page Styling --- */
