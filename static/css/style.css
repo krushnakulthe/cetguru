@@ -179,7 +179,8 @@ input:focus, select:focus {
 /* ... (तुमचा predictor-card-new चा बाकीचा कोड जसा आहे तसाच ठेवा) ... */
 
 
-/* Results section */
+/* --- Final Polished & Compact Results Card Styling --- */
+
 .results {
     margin-top: 2rem;
     padding: 0;
@@ -187,8 +188,8 @@ input:focus, select:focus {
 
 .college-card {
   background-color: var(--card-bg);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;         /* Padding कमी केली */
+  margin-bottom: 1.25rem;       /* Margin कमी केली */
   border-radius: 12px;
   border-left: 5px solid var(--primary-color);
   box-shadow: 0 5px 20px rgba(0,0,0,0.06);
@@ -201,73 +202,57 @@ input:focus, select:focus {
   box-shadow: 0 8px 30px rgba(0, 119, 182, 0.15), 0 0 20px rgba(0, 119, 182, 0.1);
 }
 
+/* College Name (Title) */
 .college-card strong.college-title {
     display: block; 
-    font-size: 1.3rem;
+    font-size: 1.3rem;              /* फॉन्ट साईज थोडी कमी केली */
     color: var(--primary-color);
     font-weight: 700;
     word-break: break-word;
     line-height: 1.3;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;            /* Margin कमी केली */
+    padding-bottom: 0.5rem;         /* Padding कमी केली */
     border-bottom: 1px solid #e9ecef;
 }
 
-/* === हा भाग सर्वात महत्त्वाचा आहे === */
-
-/* Default layout for Desktop (side-by-side) */
+/* All <p> tags inside the card */
 .college-card p {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    gap: 0.75rem;
-    margin: 0.7rem 0 0 0;
-    line-height: 1.4;
-    font-size: 1rem;
+    margin: 0.7rem 0 0 0;           /* Margin कमी केली */
+    line-height: 1.2;
+    font-size: 1.1rem;              /* फॉन्ट साईज थोडी कमी केली */
     font-weight: 500;
     color: var(--text-color);
 }
 
+/* The label part (e.g., "Branch:", "Choice Code:") */
 .college-card p strong {
+    display: block;
+    font-size: 0.8rem;              /* फॉन्ट साईज थोडी कमी केली */
     font-weight: 600;
     color: #0077B6;
-    white-space: nowrap;
+    margin-bottom: 0.2rem;          /* Margin कमी केली */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
+/* Making the "(Cutoff)" part a lighter color */
+.college-card p strong::after {
+    content: " (Cutoff)";
+    color: #6c757d;
+    font-weight: 400;
+    display: none; /* Hide by default */
+}
+/* Show it only for specific labels */
+.college-card p strong.cutoff-label::after {
+    display: inline;
+}
+
+/* Styles for nested spans like Admission Chance & Choice Code */
 .college-card p span {
     font-weight: 500;
-    text-align: left;
 }
-
 .college-card p span span {
     font-weight: 700;
-}
-
-/* Responsive adjustments for Mobile */
-@media (max-width: 576px) {
-    .predictor-page-main-new {
-        padding: 0 0.75rem;
-    }
-    
-    /* Change to "Label on Top" layout ONLY on mobile */
-    .college-card p {
-        display: block; /* Grid मधून काढून block केले */
-        margin-top: 1rem;
-    }
-    
-    .college-card p strong {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #0077B6;
-        text-transform: uppercase;
-        margin-bottom: 0.25rem;
-    }
-    
-    .college-card p span {
-        font-size: 1.1rem;
-        font-weight: 500;
-    }
 }
 /* --- Footer --- */
 footer {
