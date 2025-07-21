@@ -1,34 +1,58 @@
 // Global variable to store DSE options
 let dseOptions = {
     categories: { eng: [], phy: [] },
-    branches: { eng: [], phy: [] }
+    branches: { eng: [], phy: [] },
+    rounds: { eng: [], phy: [] } // राऊंडची रचना अशीच ठेवा
 };
 
 // DOM Elements
 const groupSelect = document.getElementById('group');
 const catSelect = document.getElementById('category');
 const branchSelect = document.getElementById('branch');
+const roundSelect = document.getElementById('round');
 const resultsDiv = document.getElementById("results");
 
 async function fetchDseOptions() {
     try {
+        // तुमच्या लोकल टेस्टिंगसाठी http://127.0.0.1:5000 वापरा
+        // लाइव्ह झाल्यावर https://cet-guru-api.onrender.com वापरा
         const response = await fetch("https://cet-guru-api.onrender.com/get-dse-options");
         if (!response.ok) throw new Error('Failed to load DSE options from server.');
         dseOptions = await response.json();
-        filterDseOptions();
+        
+        // सुरुवातीला पेज लोड झाल्यावर एकदा सर्व ड्रॉपडाऊन भरा
+        filterDseOptions(); 
     } catch (error) {
         console.error("Error fetching DSE options:", error);
         catSelect.innerHTML = '<option value="">Error loading categories</option>';
         branchSelect.innerHTML = '<option value="">Error loading branches</option>';
+        roundSelect.innerHTML = '<option value="">Error loading rounds</option>';
     }
 }
 
+// हा फंक्शन आता राऊंडची यादी सुद्धा बरोबर अपडेट करेल
 function filterDseOptions() {
     const selectedGroup = groupSelect.value;
+    
+    // Clear previous options for all dependent dropdowns
     catSelect.innerHTML = '<option value="">-- Select Category --</option>';
     branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
-    (dseOptions.categories[selectedGroup] || []).forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
-    (dseOptions.branches[selectedGroup] || []).forEach(b => branchSelect.innerHTML += `<option value="${b}">${b}</option>`);
+    roundSelect.innerHTML = '<option value="AI">✨ AI Prediction (All Rounds)</option>'; // AI पर्याय नेहमी ठेवा
+
+    // Populate Category dropdown based on selected group
+    (dseOptions.categories[selectedGroup] || []).forEach(c => {
+        catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+
+    // Populate Branch dropdown based on selected group
+    (dseOptions.branches[selectedGroup] || []).forEach(b => {
+        branchSelect.innerHTML += `<option value="${b}">${b}</option>`;
+    });
+
+    // Populate Rounds dropdown based on selected group
+    (dseOptions.rounds[selectedGroup] || []).forEach(r => {
+        roundSelect.innerHTML += `<option value="${r}">Round ${r}</option>`;
+    });
 }
 
 async function predictDseColleges() {
@@ -37,8 +61,9 @@ async function predictDseColleges() {
     const category = catSelect.value;
     const branch = branchSelect.value;
     const city = document.getElementById('city').value.trim();
+    const round = roundSelect.value;
 
-    if (isNaN(percentile) || !category || !branch) {
+    if (isNaN(percentile) || !category || !branch || !round) {
         alert("Please enter your percentage and select all required options.");
         return;
     }
@@ -49,7 +74,7 @@ async function predictDseColleges() {
         const response = await fetch("https://cet-guru-api.onrender.com/predict/dse", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ percentile, group, category, branch, city })
+            body: JSON.stringify({ percentile, group, category, branch, city, round })
         });
         if (!response.ok) throw new Error((await response.json()).error || 'Server error');
         
@@ -77,33 +102,33 @@ function displayDseColleges(data) {
         const cutoff = college["Percent"];
         const difference = userPercentile - cutoff;
         
-        // Admission Chance Logic
         let chance = 'Tough Chance';
         let chanceClass = 'chance-low';
 
-        if (difference >= 3) { // 3% पेक्षा जास्त फरक असेल तर High
+        if (difference >= 3) {
             chance = 'High Chance';
             chanceClass = 'chance-high';
-        } else if (difference >= 0.5) { // 0.5% ते 3% फरक असेल तर Medium
+        } else if (difference >= 0.5) {
             chance = 'Medium Chance';
             chanceClass = 'chance-medium';
         }
-        // अन्यथा Tough Chance राहील
 
         const div = document.createElement("div");
         div.className = "college-card";
         div.innerHTML = `
-    <strong class="college-title">${college["College Name"]}</strong>
-    <p><strong>College Code:</strong> <span>${college["College Code"] || 'N/A'}</span></p>
-    <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
-    <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
-    <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
-    <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
-    <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
-`;
+            <strong class="college-title">${college["College Name"]}</strong>
+            <p><strong>College Code:</strong> ${college["College Code"] || 'N/A'}</p>
+            <p><strong>Branch:</strong> ${college["Course Name"]}</p>
+            <div class="card-details-grid">
+                <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
+                <p><strong>Round:</strong> <span>${college["Round"] || 'N/A'}</span></p>
+            </div>
+            <p><strong>Choice Code:</strong> <span class="choice-code">${college["Choice Code"] || 'N/A'}</span></p>
+            <p><strong>Closing Percent (Cutoff):</strong> ${cutoff}%</p>
+            <p><strong>Admission Chance:</strong> <span class="${chanceClass}">${chance}</span></p>
+        `;
         resultsDiv.appendChild(div);
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', fetchDseOptions);

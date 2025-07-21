@@ -1,33 +1,42 @@
 // Global variable to store options fetched from the backend
 let mhtcetOptions = {
     categories: { PCM: [], PCB: [] },
-    branches: { PCM: [], PCB: [] }
+    branches: { PCM: [], PCB: [] },
+    rounds: [] // राऊंडसाठी नवीन जागा
 };
 
 // DOM Elements
 const groupSelect = document.getElementById('group');
 const catSelect = document.getElementById('category');
 const branchSelect = document.getElementById('branch');
+const roundSelect = document.getElementById('round'); // राऊंड ड्रॉपडाऊनसाठी नवीन व्हेरिएबल
 const resultsDiv = document.getElementById("results");
 let currentResults = [];
 
 /**
- * Fetches MHT-CET options (categories, branches) from the backend.
+ * Fetches MHT-CET options (categories, branches, rounds) from the backend.
  */
 async function fetchMhtcetOptions() {
     try {
-        // तुमच्या लाइव्ह Render API ची URL वापरा
         const response = await fetch("https://cet-guru-api.onrender.com/get-mhtcet-options");
         if (!response.ok) {
             throw new Error('Failed to load MHT-CET options from server.');
         }
         mhtcetOptions = await response.json();
-        // Populate the dropdowns for the first time
+        
+        // Populate Rounds dropdown first
+        roundSelect.innerHTML = '<option value="AI">✨ AI Prediction (All Rounds)</option>';
+        (mhtcetOptions.rounds || []).forEach(r => {
+            roundSelect.innerHTML += `<option value="${r}">Round ${r}</option>`;
+        });
+
+        // Populate other dropdowns for the first time
         filterOptions(); 
     } catch (error) {
         console.error("Error fetching MHT-CET options:", error);
-        catSelect.innerHTML = '<option>Error loading categories</option>';
-        branchSelect.innerHTML = '<option>Error loading branches</option>';
+        catSelect.innerHTML = '<option value="">Error loading categories</option>';
+        branchSelect.innerHTML = '<option value="">Error loading branches</option>';
+        roundSelect.innerHTML = '<option value="">Error loading rounds</option>';
     }
 }
 
@@ -37,25 +46,14 @@ async function fetchMhtcetOptions() {
 function filterOptions() {
     const selectedGroup = groupSelect.value;
     
-    // Clear previous options
     catSelect.innerHTML = '<option value="">-- Select Category --</option>';
     branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
 
-    // Populate Category dropdown
     const categoriesForGroup = mhtcetOptions.categories[selectedGroup] || [];
-    if (categoriesForGroup.length > 0) {
-        categoriesForGroup.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
-    } else {
-        catSelect.innerHTML = '<option>No categories found</option>';
-    }
+    categoriesForGroup.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
 
-    // Populate Branch dropdown
     const branchesForGroup = mhtcetOptions.branches[selectedGroup] || [];
-    if (branchesForGroup.length > 0) {
-        branchesForGroup.forEach(b => branchSelect.innerHTML += `<option value="${b}">${b}</option>`);
-    } else {
-        branchSelect.innerHTML = '<option>No branches found</option>';
-    }
+    branchesForGroup.forEach(b => branchSelect.innerHTML += `<option value="${b}">${b}</option>`);
 }
 
 /**
@@ -67,25 +65,21 @@ async function predictColleges() {
     const category = document.getElementById('category').value;
     const branch = document.getElementById('branch').value;
     const city = document.getElementById('city').value.trim();
+    const round = roundSelect.value; // राऊंडची निवड मिळवली
 
-    if (isNaN(percentile) || !category || !branch) {
-        alert("Please enter your percentile and select a category and branch.");
+    if (isNaN(percentile) || !category || !branch || !round) {
+        alert("Please enter your percentile and select all required options.");
         return;
     }
 
-    resultsDiv.innerHTML = `
-        <div class="results-loading">
-            <div class="spinner"></div>
-            <p>Finding the best colleges for you...</p>
-        </div>
-    `;
+    resultsDiv.innerHTML = `<div class="results-loading"><div class="spinner"></div><p>Finding the best colleges for you...</p></div>`;
 
     try {
         const response = await fetch("https://cet-guru-api.onrender.com/predict/mhtcet", {
             method: "POST",
             mode: "cors",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ percentile, group, category, branch, city })
+            body: JSON.stringify({ percentile, group, category, branch, city, round }) // 'round' इथे पाठवला
         });
 
         if (!response.ok) {
@@ -98,7 +92,7 @@ async function predictColleges() {
         displayColleges(data);
 
     } catch (err) {
-        resultsDiv.innerHTML = `<div class="no-results"><strong>Error:</strong> Could not get prediction. Please check the backend server logs. <br>Details: ${err.message}</div>`;
+        resultsDiv.innerHTML = `<div class="no-results"><strong>Error:</strong> ${err.message}</div>`;
         console.error(err);
     }
 }
@@ -134,59 +128,23 @@ function displayColleges(data) {
 
         const div = document.createElement("div");
         div.className = "college-card";
-        // --- ही रचना महत्त्वाची आहे ---
+        
+        // निकालांमध्ये राऊंडची माहिती दाखवली
         div.innerHTML = `
             <strong class="college-title">${college["College Name"]}</strong>
-            <p><strong>College Code:</strong> <span>${college["College Code"] || 'N/A'}</span></p>
-            <p><strong>Branch:</strong> <span>${college["Course Name"]}</span></p>
-            <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
-            <p><strong>Choice Code:</strong> <span><span class="choice-code">${college["Choice Code"] || 'N/A'}</span></span></p>
-            <p><strong>Closing Percentile (Cutoff):</strong> <span>${cutoff}%</span></p>
-            <p><strong>Admission Chance:</strong> <span><span class="${chanceClass}">${chance}</span></span></p>
+            <p><strong>College Code:</strong> ${college["College Code"] || 'N/A'}</p>
+            <p><strong>Branch:</strong> ${college["Course Name"]}</p>
+            <div class="card-details-grid">
+                <p><strong>Category:</strong> <span>${college["Category"]}</span></p>
+                <p><strong>Round:</strong> <span>${college["Round"] || 'N/A'}</span></p>
+            </div>
+            <p><strong>Choice Code:</strong> <span class="choice-code">${college["Choice Code"] || 'N/A'}</span></p>
+            <p><strong>Closing Percentile (Cutoff):</strong> ${cutoff}%</p>
+            <p><strong>Admission Chance:</strong> <span class="${chanceClass}">${chance}</span></p>
         `;
         resultsDiv.appendChild(div);
     });
 }
 
-/**
- * Downloads the current results as a CSV file.
- */
-function downloadCSV() {
-    if (currentResults.length === 0) {
-        alert("No results to download. Please predict colleges first.");
-        return;
-    }
-    const userPercentile = parseFloat(document.getElementById('percentile').value) || 0;
-    
-    const headers = ["College Name", "Course Name", "Choice Code", "Category", "Closing Percentile", "Admission Chance"];
-    
-    const rows = currentResults.map(c => {
-        const cutoff = c["Percent"];
-        const difference = userPercentile - cutoff;
-        let chance = 'Tough Chance';
-        if (difference >= 3) chance = 'High Chance';
-        else if (difference >= 0.5) chance = 'Medium Chance';
-
-        return [
-            `"${c["College Name"].replace(/"/g, '""')}"`,
-            `"${c["Course Name"].replace(/"/g, '""')}"`,
-            c["Choice Code"],
-            c["Category"],
-            cutoff,
-            chance
-        ];
-    });
-
-    let csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "cetguru_mhtcet_colleges.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
 // === Event Listener ===
-// This function will be called as soon as the page loads.
 document.addEventListener('DOMContentLoaded', fetchMhtcetOptions);
