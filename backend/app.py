@@ -13,14 +13,13 @@ mhtcet_data, jee_data, dse_data, nursing_data = None, None, None, None
 
 # --- Data Loading and Cleaning Function ---
 def load_data():
-    """Loads and cleans all the CSV data into pandas DataFrames."""
+    # ... तुमचा load_data() फंक्शन जसा आहे तसाच आहे, त्यात बदल नाही ...
     global mhtcet_data, jee_data, dse_data, nursing_data
     try:
         backend_dir = os.path.dirname(os.path.abspath(__file__))
         # MHT-CET
         mhtcet_data = pd.read_csv(os.path.join(backend_dir, 'data', 'mhtcet_data.csv'))
-        if mhtcet_data['Percent'].dtype == 'object':
-            mhtcet_data['Percent'] = mhtcet_data['Percent'].astype(str).str.replace('%', '', regex=False)
+        if mhtcet_data['Percent'].dtype == 'object': mhtcet_data['Percent'] = mhtcet_data['Percent'].astype(str).str.replace('%', '', regex=False)
         mhtcet_data['Percent'] = pd.to_numeric(mhtcet_data['Percent'], errors='coerce')
         mhtcet_data.dropna(subset=['Percent'], inplace=True)
         print("MHT-CET data loaded successfully!")
@@ -32,15 +31,13 @@ def load_data():
         print("JEE data loaded successfully!")
         # DSE
         dse_data = pd.read_csv(os.path.join(backend_dir, 'data', 'dse_data.csv'))
-        if dse_data['Percent'].dtype == 'object':
-            dse_data['Percent'] = dse_data['Percent'].astype(str).str.replace('%', '', regex=False)
+        if dse_data['Percent'].dtype == 'object': dse_data['Percent'] = dse_data['Percent'].astype(str).str.replace('%', '', regex=False)
         dse_data['Percent'] = pd.to_numeric(dse_data['Percent'], errors='coerce')
         dse_data.dropna(subset=['Percent'], inplace=True)
         print("DSE data loaded successfully!")
         # Nursing
         nursing_data = pd.read_csv(os.path.join(backend_dir, 'data', 'nursing_data.csv'))
-        if nursing_data['Percent'].dtype == 'object':
-            nursing_data['Percent'] = nursing_data['Percent'].astype(str).str.replace('%', '', regex=False)
+        if nursing_data['Percent'].dtype == 'object': nursing_data['Percent'] = nursing_data['Percent'].astype(str).str.replace('%', '', regex=False)
         nursing_data['Percent'] = pd.to_numeric(nursing_data['Percent'], errors='coerce')
         nursing_data.dropna(subset=['Percent'], inplace=True)
         print("Nursing data loaded successfully!")
@@ -49,6 +46,7 @@ def load_data():
 
 # --- AI Prediction Helper Function ---
 def get_ai_prediction(df, percentile_col, user_percentile, group_cols):
+    # ... तुमचा AI फंक्शन जसा आहे तसाच आहे, त्यात बदल नाही ...
     if df.empty or 'Round' not in df.columns: return pd.DataFrame()
     unique_key = ['College Name', 'Course Name']
     if 'Category' in df.columns: unique_key.append('Category')
@@ -60,8 +58,10 @@ def get_ai_prediction(df, percentile_col, user_percentile, group_cols):
     return prediction_df
 
 # --- API Endpoints ---
+
 @app.route('/get-mhtcet-options', methods=['GET'])
 def get_mhtcet_options():
+    # ... तुमचा जुना कोड (यात बदल नाही) ...
     if mhtcet_data is not None:
         try:
             rounds = pd.to_numeric(mhtcet_data['Round'], errors='coerce').dropna().unique()
@@ -82,9 +82,16 @@ def predict_mhtcet():
         data = request.json
         user_percentile, group, category, branch, city, round_choice = (float(data.get('percentile', 0)), data.get('group'), data.get('category'), data.get('branch'), data.get('city', '').strip().lower(), data.get('round'))
         base_filtered_df = mhtcet_data[(mhtcet_data['Group'] == group) & (mhtcet_data['Category'] == category) & (mhtcet_data['Course Name'] == branch)].copy()
+        
         if round_choice == "AI": filtered = get_ai_prediction(base_filtered_df, 'Percent', user_percentile, ['Group'])
         else: filtered = base_filtered_df[(base_filtered_df['Percent'] <= user_percentile) & (base_filtered_df['Round'].astype(str) == str(round_choice))].copy()
+        
         if city: filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
+        
+        # === डुप्लिकेट्स काढण्यासाठी नवीन लॉजिक ===
+        if not filtered.empty:
+            filtered = filtered.loc[filtered.groupby(['College Name', 'Course Name', 'Category', 'Group'])['Percent'].idxmax()]
+            
         return jsonify(filtered.sort_values(by='Percent', ascending=False).to_dict('records'))
     except Exception as e:
         print(f"--- ERROR in /predict/mhtcet: {traceback.format_exc()} ---")
@@ -92,6 +99,7 @@ def predict_mhtcet():
 
 @app.route('/get-jee-options', methods=['GET'])
 def get_jee_options():
+    # ... तुमचा जुना कोड (यात बदल नाही) ...
     if jee_data is not None:
         try:
             branches = sorted(jee_data['Course Name'].dropna().unique().tolist())
@@ -109,38 +117,42 @@ def predict_jee():
         data = request.json
         user_percentile, branch, city, round_choice = (float(data.get('percentile', 0)), data.get('branch'), data.get('city', '').strip().lower(), data.get('round'))
         base_filtered_df = jee_data[jee_data['Course Name'] == branch].copy()
+        
         if round_choice == "AI": filtered = get_ai_prediction(base_filtered_df, 'Percentile', user_percentile, [])
         else: filtered = base_filtered_df[(base_filtered_df['Percentile'] <= user_percentile) & (base_filtered_df['Round'].astype(str) == str(round_choice))].copy()
+        
         if city: filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
+        
+        # === डुप्लिकेट्स काढण्यासाठी नवीन लॉजिक ===
+        if not filtered.empty:
+            # JEE मध्ये कॅटेगरी नसल्यामुळे, फक्त कॉलेज आणि कोर्सवर ग्रुपिंग करू
+            filtered = filtered.loc[filtered.groupby(['College Name', 'Course Name'])['Percentile'].idxmax()]
+
         return jsonify(filtered.sort_values(by='Percentile', ascending=False).to_dict('records'))
     except Exception as e:
         print(f"--- ERROR in /predict/jee: {traceback.format_exc()} ---")
         return jsonify({"error": "An unexpected server error occurred."}), 500
 
-# === DSE Endpoints (हा भाग सुधारित आहे) ===
 @app.route('/get-dse-options', methods=['GET'])
 def get_dse_options():
+    # ... तुमचा जुना कोड (यात बदल नाही) ...
     if dse_data is not None:
         try:
             eng_cat = sorted(dse_data[dse_data['Group'].str.lower() == 'eng']['Category'].unique().tolist())
             phy_cat = sorted(dse_data[dse_data['Group'].str.lower() == 'phy']['Category'].unique().tolist())
             eng_branch = sorted(dse_data[dse_data['Group'].str.lower() == 'eng']['Course Name'].unique().tolist())
             phy_branch = sorted(dse_data[dse_data['Group'].str.lower() == 'phy']['Course Name'].unique().tolist())
-            
-            # Eng आणि Phy साठी स्वतंत्रपणे राऊंडची यादी मिळवा
             eng_rounds_raw = pd.to_numeric(dse_data[dse_data['Group'].str.lower() == 'eng']['Round'], errors='coerce').dropna().unique()
             phy_rounds_raw = pd.to_numeric(dse_data[dse_data['Group'].str.lower() == 'phy']['Round'], errors='coerce').dropna().unique()
             eng_rounds = sorted([str(int(r)) for r in eng_rounds_raw])
             phy_rounds = sorted([str(int(r)) for r in phy_rounds_raw])
-
             options = {
                 "categories": {"eng": eng_cat, "phy": phy_cat},
                 "branches": {"eng": eng_branch, "phy": phy_branch},
-                "rounds": {"eng": eng_rounds, "phy": phy_rounds} # <-- राऊंडची यादी ग्रुपनुसार विभागली
+                "rounds": {"eng": eng_rounds, "phy": phy_rounds}
             }
             return jsonify(options)
-        except Exception as e:
-            return jsonify({"error": f"Failed to retrieve DSE options: {e}"}), 500
+        except Exception as e: return jsonify({"error": f"Failed to retrieve DSE options: {e}"}), 500
     return jsonify({"error": "DSE data not loaded"}), 500
 
 @app.route('/predict/dse', methods=['POST'])
@@ -150,9 +162,16 @@ def predict_dse():
         data = request.json
         user_percentile, group, category, branch, city, round_choice = (float(data.get('percentile', 0)), data.get('group'), data.get('category'), data.get('branch'), data.get('city', '').strip().lower(), data.get('round'))
         base_filtered_df = dse_data[(dse_data['Group'].str.lower() == group) & (dse_data['Category'] == category) & (dse_data['Course Name'] == branch)].copy()
+        
         if round_choice == "AI": filtered = get_ai_prediction(base_filtered_df, 'Percent', user_percentile, ['Group'])
         else: filtered = base_filtered_df[(base_filtered_df['Percent'] <= user_percentile) & (base_filtered_df['Round'].astype(str) == str(round_choice))].copy()
+        
         if city: filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
+        
+        # === डुप्लिकेट्स काढण्यासाठी नवीन लॉजिक ===
+        if not filtered.empty:
+            filtered = filtered.loc[filtered.groupby(['College Name', 'Course Name', 'Category', 'Group'])['Percent'].idxmax()]
+            
         return jsonify(filtered.sort_values(by='Percent', ascending=False).to_dict('records'))
     except Exception as e:
         print(f"--- ERROR in /predict/dse: {traceback.format_exc()} ---")
@@ -161,19 +180,19 @@ def predict_dse():
 # --- Nursing Endpoints (यात बदल नाही) ---
 @app.route('/get-nursing-categories', methods=['GET'])
 def get_nursing_categories():
-    if nursing_data is not None:
-        return jsonify(sorted(nursing_data['Category'].unique().tolist()))
+    # ... तुमचा जुना कोड (यात बदल नाही) ...
+    if nursing_data is not None: return jsonify(sorted(nursing_data['Category'].unique().tolist()))
     return jsonify({"error": "Nursing data not available"}), 500
 
 @app.route('/predict/nursing', methods=['POST'])
 def predict_nursing():
+    # ... तुमचा जुना कोड (यात बदल नाही) ...
     if nursing_data is None: return jsonify({"error": "Nursing data not loaded."}), 500
     try:
         data = request.json
         user_percentile, category, city = (float(data.get('percentile', 0)), data.get('category'), data.get('city', '').strip().lower())
         filtered = nursing_data[(nursing_data['Percent'] <= user_percentile) & (nursing_data['Category'] == category)].copy()
-        if city:
-            filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
+        if city: filtered = filtered[filtered['College Name'].str.lower().str.contains(city, na=False)]
         return jsonify(filtered.sort_values(by='Percent', ascending=False).to_dict('records'))
     except Exception as e:
         print(f"--- ERROR in /predict/nursing: {traceback.format_exc()} ---")
